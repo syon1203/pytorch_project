@@ -7,8 +7,8 @@ use_cuda = torch.cuda.is_available()
 device = torch.device('cuda' if use_cuda else 'cpu')
 
 
-def ResNet34():
-    resnet = models.resnet34(weights=ResNet34_Weights.DEFAULT)
+def ResNet34(weight):
+    resnet = models.resnet34(weights=weight)
     resnet.aux_logits = False
     num_ftrs = resnet.fc.in_features
     resnet.fc = nn.Linear(num_ftrs, 10)  # output 크기 10
@@ -16,8 +16,8 @@ def ResNet34():
 
     return resnet
 
-def ResNet18():
-    resnet = models.resnet18(weights=ResNet18_Weights.DEFAULT)
+def ResNet18(weight):
+    resnet = models.resnet18(weights=weight)
     resnet.aux_logits = False
     num_ftrs = resnet.fc.in_features
     resnet.fc = nn.Linear(num_ftrs, 10)  # output 크기 10
