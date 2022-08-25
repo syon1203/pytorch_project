@@ -26,4 +26,5 @@ def evaluation(model, dataloader, dataset):
     test_loss = test_loss / len(dataset)
     test_accuracy = test_accuracy / len(dataset)
 
-    print(' Test Loss: ' + str(test_loss) + ' Test Accuracy: ' + str(100 * test_accuracy) + '%')
+    return test_loss, test_accuracy
+

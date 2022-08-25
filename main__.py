@@ -55,20 +55,25 @@ trainloader = DataLoader(trainset, batch_size=args.batch, shuffle=True)
 #print(len(testset))
 #print(len(trainset))
 
-training(model, trainloader, trainset, args.lr, args.epoch)
 
-if args.model == 'resnet34':
-    model = RN.ResNet34()
-    model.load_state_dict(torch.load('model_weights.pth'))
-    model.eval()
+for epoch in range(args.epoch):
+    #print(epoch)
+    loss, accuracy = training(model, trainloader, trainset, args.lr, args.epoch)
 
-elif args.model == 'resnet18':
-    model = RN.ResNet18()
-    model.load_state_dict(torch.load('model_weights.pth'))
-    model.eval()
-else:
-    model = None
+    if args.model == 'resnet34':
+        model = RN.ResNet34()
+        model.load_state_dict(torch.load('model_weights.pth'))
+        model.eval()
 
-evaluation(model, testloader, testset)
+    elif args.model == 'resnet18':
+        model = RN.ResNet18()
+        model.load_state_dict(torch.load('model_weights.pth'))
+        model.eval()
+    else:
+        model = None
+
+    test_loss, test_accuracy = evaluation(model, testloader, testset)
+
+    print(' Test Loss: ' + str(test_loss) + ' Test Accuracy: ' + str(100 * test_accuracy) + '%')
 
 
