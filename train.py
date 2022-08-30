@@ -16,15 +16,7 @@ device = torch.device('cuda' if use_cuda else 'cpu')
 #print(sample.size())
 
 
-def training(model, dataloader, dataset, learning_rate=0.001, total_epochs=10):
-
-
-    criterion = nn.CrossEntropyLoss()
-    optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
-    scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=3, threshold=1e-3)
-
-
-    epochs = total_epochs # 전체 데이터를 활용한 학습 진행 횟수
+def training(model, dataloader, dataset, criterion,  optimizer, scheduler):
 
     model.train()
     train_accuracy = 0.0
@@ -44,6 +36,7 @@ def training(model, dataloader, dataset, learning_rate=0.001, total_epochs=10):
 
         train_accuracy += int(torch.sum(prediction == labels.data))
 
+    #dataset 넘겨주지 않기
     train_loss = train_loss / len(dataset)
     train_accuracy = train_accuracy / len(dataset)
 

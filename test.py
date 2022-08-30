@@ -2,6 +2,8 @@ import torch
 import torch.nn as nn
 from torch.autograd import Variable
 
+use_cuda = torch.cuda.is_available()
+device = torch.device('cuda' if use_cuda else 'cpu')
 
 def evaluation(model, dataloader, dataset):
     criterion = nn.CrossEntropyLoss()
@@ -11,9 +13,7 @@ def evaluation(model, dataloader, dataset):
     test_accuracy = 0.0
 
     for i, (images, labels) in enumerate(dataloader):
-        if torch.cuda.is_available():
-            images = Variable(images.cuda())
-            labels = Variable(labels.cuda())
+        images, labels = images.to(device), labels.to(device)
 
         outputs = model(images)
         loss = criterion(outputs, labels)
