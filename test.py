@@ -11,6 +11,7 @@ def evaluation(model, dataloader, dataset):
     model.eval()
     test_loss = 0.0
     test_accuracy = 0.0
+    data_len = 0
 
     for i, (images, labels) in enumerate(dataloader):
         images, labels = images.to(device), labels.to(device)
@@ -22,9 +23,10 @@ def evaluation(model, dataloader, dataset):
         _, prediction = torch.max(outputs.data, 1)
 
         test_accuracy += int(torch.sum(prediction == labels.data))
+        data_len += len(prediction)
 
-    test_loss = test_loss / len(dataset)
-    test_accuracy = test_accuracy / len(dataset)
+    test_loss = test_loss / data_len
+    test_accuracy = test_accuracy / data_len
 
     return test_loss, test_accuracy
 

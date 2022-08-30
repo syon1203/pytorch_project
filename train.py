@@ -21,6 +21,7 @@ def training(model, dataloader, dataset, criterion,  optimizer, scheduler):
     model.train()
     train_accuracy = 0.0
     train_loss = 0.0
+    data_len = 0
       # Training
     for i, (images, labels) in enumerate(dataloader):
         images, labels = images.to(device), labels.to(device)
@@ -35,10 +36,11 @@ def training(model, dataloader, dataset, criterion,  optimizer, scheduler):
         _, prediction = torch.max(outputs.data, 1)
 
         train_accuracy += int(torch.sum(prediction == labels.data))
+        data_len += len(prediction)
 
     #dataset 넘겨주지 않기
-    train_loss = train_loss / len(dataset)
-    train_accuracy = train_accuracy / len(dataset)
+    train_loss = train_loss / data_len
+    train_accuracy = train_accuracy / data_len
 
     return train_loss, train_accuracy
 
