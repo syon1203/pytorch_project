@@ -10,6 +10,9 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.optim.lr_scheduler import ReduceLROnPlateau
+import matplotlib.pyplot as plt
+from torchvision.utils import make_grid
+
 
 def main():
     # 인자값을 받을 수 있는 인스턴스 생성
@@ -19,7 +22,7 @@ def main():
     parser.add_argument('--train', '-tr', required=False, default='./cifar10/train', help='Root of Trainset')
     parser.add_argument('--test', '-ts', required=False, default='./cifar10/test', help='Root of Testset')
     parser.add_argument('--model', '-m', required=False, default='resnet34', help='Name of Model')
-    parser.add_argument('--batch', '-b', required=False, default=32, help='Batch Size')
+    parser.add_argument('--batch', '-b', required=False, default=4, help='Batch Size')
     parser.add_argument('--epoch', '-e', required=False, default=10, help='Epoch')
     parser.add_argument('--lr', '-l', required=False, default=0.001, help='Learning Rate')
 
@@ -58,9 +61,6 @@ def main():
                                       [-0.5808, -0.0045, -0.8140],
                                       [-0.5836, -0.6948, 0.4203]])
 
-    #transf_train = tr.Compose([tr.ToPILImage(), tr.RandomCrop(32, padding=4), tr.RandomHorizontalFlip(), tr.ToTensor(), tr.Normalize(*stats, inplace=True)])
-    #transf_test = tr.Compose([tr.ToPILImage(), tr.ToTensor(), tr.Normalize(*stats, inplace=True)])
-
     transf_train = tr.Compose([tr.ToTensor(), tr.RandomCrop(32, padding=4), tr.RandomHorizontalFlip(), jittering, lighting, tr.Normalize(*stats, inplace=True)])
     transf_test = tr.Compose([tr.ToTensor(), tr.Normalize(*stats, inplace=True)])
 
@@ -69,10 +69,6 @@ def main():
 
     testloader = DataLoader(testset, batch_size=args.batch, shuffle=False)
     trainloader = DataLoader(trainset, batch_size=args.batch, shuffle=True)
-
-    import matplotlib.pyplot as plt
-    from torchvision.utils import make_grid
-    import numpy as np
 
     def show_batch(dl):
         for images, labels in dl:
@@ -86,36 +82,43 @@ def main():
             #plt.show()
             break
 
-
     #show_batch(trainloader)
-
-    # print(len(testset))
-    # print(len(trainset))
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=0.9)
     scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=3, threshold=1e-3)
 
     for epoch in range(args.epoch):
-        #print(epoch)
+
         train_loss, train_accuracy = training(model, trainloader, criterion, optimizer, scheduler)
 
-        test_loss, test_accuracy = evaluation(model, testloader)
+        test_loss, test_accuracy = evaluation(model, testloader, criterion)
 
         print(f'Epoch:{epoch} Train loss:{train_loss} Train accuracy:{100*train_accuracy:.4f}% Test loss:{test_loss} Test accuracy:{100*test_accuracy:.4f}%')
 
-        is_best = test_accuracy <= best_err
+        best_err = test_accuracy <= best_err
         best_err = min(test_accuracy, best_err)
 
         if best_err == test_accuracy:
             torch.save(model.state_dict(), 'model_weights.pth')
 
-    #model.load_state_dict(torch.load('model_weights.pth'))
+    model.load_state_dict(torch.load('model_weights.pth'))
 
 
 if __name__ == "__main__":
     main()
 
-
+"""
+Epoch:0 Train loss:1.8830300569534302 Train accuracy:30.4620% Test loss:1.4114612340927124 Test accuracy:48.7400%
+Epoch:1 Train loss:1.3994910717010498 Train accuracy:49.8900% Test loss:1.117986798286438 Test accuracy:61.2300%
+Epoch:2 Train loss:1.10672926902771 Train accuracy:60.8920% Test loss:0.9473481178283691 Test accuracy:67.3300%
+Epoch:3 Train loss:0.9372214674949646 Train accuracy:67.3540% Test loss:0.7944387793540955 Test accuracy:72.8700%
+Epoch:4 Train loss:0.8333507776260376 Train accuracy:70.9560% Test loss:0.7847883105278015 Test accuracy:74.1100%
+Epoch:5 Train loss:0.7588878273963928 Train accuracy:73.8080% Test loss:0.7335292100906372 Test accuracy:74.5800%
+Epoch:6 Train loss:0.6561610102653503 Train accuracy:77.4260% Test loss:0.6177797317504883 Test accuracy:79.0200%
+Epoch:7 Train loss:0.6217713952064514 Train accuracy:78.5260% Test loss:0.5766865015029907 Test accuracy:80.1500%
+Epoch:8 Train loss:0.597963273525238 Train accuracy:79.3080% Test loss:0.5386070013046265 Test accuracy:81.9400%
+Epoch:9 Train loss:0.5734032392501831 Train accuracy:80.1240% Test loss:0.5370789766311646 Test accuracy:81.7500%
+"""
 
 

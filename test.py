@@ -1,13 +1,11 @@
 import torch
-import torch.nn as nn
-from torch.autograd import Variable
 
 use_cuda = torch.cuda.is_available()
 device = torch.device('cuda' if use_cuda else 'cpu')
 
-def evaluation(model, dataloader):
-    criterion = nn.CrossEntropyLoss()
 
+def evaluation(model, dataloader, criterion):
+    model.to(device)
     model.eval()
     with torch.no_grad():
         test_loss = 0.0

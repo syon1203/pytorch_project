@@ -2,12 +2,9 @@ import os
 import matplotlib.image as img
 from torch.utils.data import Dataset
 import torch
-from PIL import Image
-import numpy as np
 
 def get_labels(root):
     label = os.walk(root).__next__()[1]
-    #labels = {string for i, string in enumerate(label)}
     return label
 
 
@@ -20,12 +17,8 @@ def match_image(root):
         a.remove('.DS_Store')
 
     for i, label in enumerate(a):
-        #print(labels)
         labels[i] = i
-        #print(labels[i])
         try:
-            #print(label)
-            #print(i)
             for j in os.listdir(os.path.join(root, label)):
                 image = img.imread(os.path.join(root, label,j))
                 images.append((i, image))
@@ -48,11 +41,8 @@ class CIFAR10(Dataset):
         if torch.is_tensor(index):
             index = index.tolist()
 
-        #imgarr = imgarr.astype(np.uint8)
-        #image = Image.fromarray(imgarr).convert('RGB')
         label = self.images[index][0]
         image = self.images[index][1]
-        #image = Image.fromarray(np.uint8(img))
 
         if self.transform:
             image = self.transform(image)
