@@ -47,14 +47,47 @@ def main():
     else:
         model = None
 
-    transf_train = tr.Compose([tr.RandomCrop(32, padding=4), tr.ToTensor(),tr.Normalize((0.5,0.5,0.5),(0.5,0.5,0.5))])
-    transf_test = tr.Compose([tr.ToTensor(), tr.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+    # Data transforms (normalization & data augmentation)
+    stats = ((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))
+
+    jittering = util.ColorJitter(brightness=0.4, contrast=0.4,
+                                  saturation=0.4)
+    lighting = util.Lighting(alphastd=0.1,
+                              eigval=[0.2175, 0.0188, 0.0045],
+                              eigvec=[[-0.5675, 0.7192, 0.4009],
+                                      [-0.5808, -0.0045, -0.8140],
+                                      [-0.5836, -0.6948, 0.4203]])
+
+    #transf_train = tr.Compose([tr.ToPILImage(), tr.RandomCrop(32, padding=4), tr.RandomHorizontalFlip(), tr.ToTensor(), tr.Normalize(*stats, inplace=True)])
+    #transf_test = tr.Compose([tr.ToPILImage(), tr.ToTensor(), tr.Normalize(*stats, inplace=True)])
+
+    transf_train = tr.Compose([tr.ToTensor(), tr.RandomCrop(32, padding=4), tr.RandomHorizontalFlip(), jittering, lighting, tr.Normalize(*stats, inplace=True)])
+    transf_test = tr.Compose([tr.ToTensor(), tr.Normalize(*stats, inplace=True)])
 
     testset = CIFAR10(test_root, transform=transf_test)
     trainset = CIFAR10(train_root, transform=transf_train)
 
     testloader = DataLoader(testset, batch_size=args.batch, shuffle=False)
     trainloader = DataLoader(trainset, batch_size=args.batch, shuffle=True)
+
+    import matplotlib.pyplot as plt
+    from torchvision.utils import make_grid
+    import numpy as np
+
+    def show_batch(dl):
+        for images, labels in dl:
+            # image = (image/np.amax(image) + 1)
+            # image = image/np.amax(image)
+            fig, ax = plt.subplots(figsize=(12, 12))
+            ax.set_xticks([]);
+            ax.set_yticks([])
+            ax.imshow(make_grid(images[:64], nrow=8).permute(1, 2, 0).numpy())
+            print(labels)
+            #plt.show()
+            break
+
+
+    #show_batch(trainloader)
 
     # print(len(testset))
     # print(len(trainset))

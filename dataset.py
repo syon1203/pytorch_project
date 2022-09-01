@@ -48,15 +48,14 @@ class CIFAR10(Dataset):
         if torch.is_tensor(index):
             index = index.tolist()
 
-        imgarr = np.random.random_sample(self.images[index][1].shape) * 255
-        imgarr = imgarr.astype(np.uint8)
-        image = Image.fromarray(imgarr).convert('RGB')
+        #imgarr = imgarr.astype(np.uint8)
+        #image = Image.fromarray(imgarr).convert('RGB')
         label = self.images[index][0]
+        image = self.images[index][1]
         #image = Image.fromarray(np.uint8(img))
 
         if self.transform:
             image = self.transform(image)
-
 
         return image, label
 
