@@ -30,13 +30,15 @@ def training(model, dataloader, criterion,  optimizer, scheduler):
         train_accuracy += int(torch.sum(prediction == labels.data))
         data_len += len(prediction)
 
+        # Print loss, accuracy of every batch*25th batch
         if i % (25*len(prediction)) == 0:
             batch_loss = train_loss / data_len
             batch_accuracy = train_accuracy / data_len
+
             print(f'batch {i // len(prediction)} : train loss {batch_loss} , '
                   f'train accuracy {100*batch_accuracy:.4f}%')
 
-    #dataset 넘겨주지 않기
+    # Sum of len(mini batch) == data_len
     train_loss = train_loss / data_len
     train_accuracy = train_accuracy / data_len
     scheduler.step(loss)  # Update the weight and bias

@@ -22,8 +22,8 @@ def main():
     parser.add_argument('--train', '-tr', required=False, default='./cifar10/train', help='Root of Trainset')
     parser.add_argument('--test', '-ts', required=False, default='./cifar10/test', help='Root of Testset')
     parser.add_argument('--model', '-m', required=False, default='resnet34', help='Name of Model')
-    parser.add_argument('--batch', '-b', required=False, default=4, help='Batch Size')
-    parser.add_argument('--epoch', '-e', required=False, default=10, help='Epoch')
+    parser.add_argument('--batch', '-b', required=False, default=32, help='Batch Size')
+    parser.add_argument('--epoch', '-e', required=False, default=50, help='Epoch')
     parser.add_argument('--lr', '-l', required=False, default=0.001, help='Learning Rate')
 
     best_err = 100
@@ -61,7 +61,8 @@ def main():
                                       [-0.5808, -0.0045, -0.8140],
                                       [-0.5836, -0.6948, 0.4203]])
 
-    transf_train = tr.Compose([tr.ToTensor(), tr.RandomCrop(32, padding=4), tr.RandomHorizontalFlip(), jittering,
+    transf_train = tr.Compose([tr.ToTensor(), tr.RandomCrop(32, padding=4, padding_mode='reflect'),
+                               tr.RandomHorizontalFlip(), jittering,
                                lighting, tr.Normalize(*stats, inplace=True)])
     transf_test = tr.Compose([tr.ToTensor(), tr.Normalize(*stats, inplace=True)])
 
