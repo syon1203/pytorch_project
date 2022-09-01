@@ -101,8 +101,15 @@ def main():
         best_err = test_accuracy <= best_err
         best_err = min(test_accuracy, best_err)
 
+        # 현재까지 학습한 것 중 best_err인 경우
         if best_err == test_accuracy:
-            torch.save(model.state_dict(), 'model_weights.pth')
+            torch.save({
+                'model_state_dict': model.state_dict(),
+                'optimizer_state_dict': optimizer.state_dict(),
+                'epoch': epoch
+            }, 'checkpoint.tar')
+
+
 
     model.load_state_dict(torch.load('model_weights.pth'))
 
