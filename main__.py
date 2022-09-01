@@ -61,7 +61,8 @@ def main():
                                       [-0.5808, -0.0045, -0.8140],
                                       [-0.5836, -0.6948, 0.4203]])
 
-    transf_train = tr.Compose([tr.ToTensor(), tr.RandomCrop(32, padding=4), tr.RandomHorizontalFlip(), jittering, lighting, tr.Normalize(*stats, inplace=True)])
+    transf_train = tr.Compose([tr.ToTensor(), tr.RandomCrop(32, padding=4), tr.RandomHorizontalFlip(), jittering,
+                               lighting, tr.Normalize(*stats, inplace=True)])
     transf_test = tr.Compose([tr.ToTensor(), tr.Normalize(*stats, inplace=True)])
 
     testset = CIFAR10(test_root, transform=transf_test)

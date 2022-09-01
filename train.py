@@ -30,6 +30,12 @@ def training(model, dataloader, criterion,  optimizer, scheduler):
         train_accuracy += int(torch.sum(prediction == labels.data))
         data_len += len(prediction)
 
+        if i % (25*len(prediction)) == 0:
+            batch_loss = train_loss / data_len
+            batch_accuracy = train_accuracy / data_len
+            print(f'epoch {(i % len(prediction))+1} / {len(prediction)} : train loss {batch_loss} , '
+                  f'train accuracy {100*batch_accuracy:.4f}%')
+
     #dataset 넘겨주지 않기
     train_loss = train_loss / data_len
     train_accuracy = train_accuracy / data_len
