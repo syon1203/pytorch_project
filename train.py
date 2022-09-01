@@ -33,7 +33,7 @@ def training(model, dataloader, criterion,  optimizer, scheduler):
         if i % (25*len(prediction)) == 0:
             batch_loss = train_loss / data_len
             batch_accuracy = train_accuracy / data_len
-            print(f'epoch {(i % len(prediction))+1} / {len(prediction)} : train loss {batch_loss} , '
+            print(f'batch {i // len(prediction)} : train loss {batch_loss} , '
                   f'train accuracy {100*batch_accuracy:.4f}%')
 
     #dataset 넘겨주지 않기
