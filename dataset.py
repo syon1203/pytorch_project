@@ -2,12 +2,13 @@ import os
 import matplotlib.image as img
 from torch.utils.data import Dataset
 import torch
+from PIL import Image
+import numpy as np
 
 def get_labels(root):
-    label = [f for f in os.listdir(root) if not f.startswith('.')]
-    labels = {string for i, string in enumerate(label)}
-
-    return labels
+    label = os.walk(root).__next__()[1]
+    #labels = {string for i, string in enumerate(label)}
+    return label
 
 
 def match_image(root):
@@ -30,7 +31,6 @@ def match_image(root):
                 images.append((i, image))
         except:
             pass
-
     print("finished")
     return images
 
@@ -48,16 +48,18 @@ class CIFAR10(Dataset):
         if torch.is_tensor(index):
             index = index.tolist()
 
-        image = self.images[index][1]
+        imgarr = np.random.random_sample(self.images[index][1].shape) * 255
+        imgarr = imgarr.astype(np.uint8)
+        image = Image.fromarray(imgarr).convert('RGB')
         label = self.images[index][0]
         #image = Image.fromarray(np.uint8(img))
 
         if self.transform:
             image = self.transform(image)
 
-        sample = {'image': image, 'label': label}
 
         return image, label
 
     def __len__(self):
         return len(self.images)
+

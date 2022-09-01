@@ -16,7 +16,7 @@ device = torch.device('cuda' if use_cuda else 'cpu')
 #print(sample.size())
 
 
-def training(model, dataloader, dataset, criterion,  optimizer, scheduler):
+def training(model, dataloader, criterion,  optimizer, scheduler):
 
     model.train()
     train_accuracy = 0.0

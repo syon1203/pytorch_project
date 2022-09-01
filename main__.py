@@ -47,11 +47,11 @@ def main():
     else:
         model = None
 
-    # transf_train = tr.Compose([tr.RandomCrop(32, padding=4), tr.ToTensor(),tr.Normalize((0.5,0.5,0.5),(0.5,0.5,0.5))])
+    transf_train = tr.Compose([tr.RandomCrop(32, padding=4), tr.ToTensor(),tr.Normalize((0.5,0.5,0.5),(0.5,0.5,0.5))])
     transf_test = tr.Compose([tr.ToTensor(), tr.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
     testset = CIFAR10(test_root, transform=transf_test)
-    trainset = CIFAR10(train_root, transform=transf_test)
+    trainset = CIFAR10(train_root, transform=transf_train)
 
     testloader = DataLoader(testset, batch_size=args.batch, shuffle=False)
     trainloader = DataLoader(trainset, batch_size=args.batch, shuffle=True)
@@ -65,9 +65,9 @@ def main():
 
     for epoch in range(args.epoch):
         #print(epoch)
-        train_loss, train_accuracy = training(model, trainloader, trainset, criterion, optimizer, scheduler)
+        train_loss, train_accuracy = training(model, trainloader, criterion, optimizer, scheduler)
 
-        test_loss, test_accuracy = evaluation(model, testloader, testset)
+        test_loss, test_accuracy = evaluation(model, testloader)
 
         print(f'Epoch:{epoch} Train loss:{train_loss} Train accuracy:{100*train_accuracy:.4f}% Test loss:{test_loss} Test accuracy:{100*test_accuracy:.4f}%')
 
@@ -77,11 +77,12 @@ def main():
         if best_err == test_accuracy:
             torch.save(model.state_dict(), 'model_weights.pth')
 
-    model.load_state_dict(torch.load('model_weights.pth'))
+    #model.load_state_dict(torch.load('model_weights.pth'))
 
 
 if __name__ == "__main__":
     main()
+
 
 
 
