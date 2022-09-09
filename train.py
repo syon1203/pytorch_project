@@ -48,7 +48,7 @@ def training(model, dataloader, criterion,  optimizer, scheduler, device):
         data_len += len(prediction)
 
         # Print loss, accuracy of every 2000 batch
-        if i % 2000 == 1999:
+        if i % 100 == 99:
             batch_loss = train_loss / data_len
             batch_accuracy = train_accuracy / data_len
 
