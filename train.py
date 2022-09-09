@@ -1,12 +1,7 @@
 import torch
 
-#main
-use_cuda = torch.cuda.is_available()
-device = torch.device('cuda' if use_cuda else 'cpu')
 
-
-def training(model, dataloader, criterion,  optimizer, scheduler):
-
+def training(model, dataloader, criterion,  optimizer, scheduler, device):
     model.to(device)
     model.train()
 

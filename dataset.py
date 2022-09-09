@@ -3,6 +3,7 @@ import matplotlib.image as img
 from torch.utils.data import Dataset
 import torch
 
+
 def get_labels(root):
     label = os.walk(root).__next__()[1]
     return label
@@ -21,7 +22,7 @@ def match_image(root):
         try:
             for j in os.listdir(os.path.join(root, label)):
                 image = img.imread(os.path.join(root, label,j))
-                images.append((i, image))
+                images.append((i, image)) #이미지를 어펜드할 필요 없음. 수정 필요
         except:
             pass
     print("finished")

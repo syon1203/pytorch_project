@@ -1,5 +1,5 @@
 import util
-import model2 as MD
+import model as MD
 from train import training
 import torchvision.transforms as tr
 from torch.utils.data import DataLoader
@@ -12,6 +12,9 @@ import torch.optim as optim
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 import matplotlib.pyplot as plt
 from torchvision.utils import make_grid
+
+use_cuda = torch.cuda.is_available()
+device = torch.device('cuda' if use_cuda else 'cpu')
 
 
 def main():
@@ -92,15 +95,13 @@ def main():
 
     for epoch in range(args.epoch):
 
-        train_loss, train_accuracy = training(model, trainloader, criterion, optimizer, scheduler)
+        train_loss, train_accuracy = training(model, trainloader, criterion, optimizer, scheduler, device)
 
-        test_loss, test_accuracy = evaluation(model, testloader, criterion)
+        test_loss, test_accuracy = evaluation(model, testloader, criterion, device)
 
         print(f'Epoch:{epoch} Train loss:{train_loss} Train accuracy:{100*train_accuracy:.4f}% Test loss:{test_loss} Test accuracy:{100*test_accuracy:.4f}%')
 
-        if test_accuracy <= best_err:
-            best_err = test_accuracy #bool 값인지 확인
-            best_err = min(test_accuracy, best_err)
+        best_err = min(test_accuracy, best_err)
 
         # 현재까지 학습한 것 중 best_err인 경우
         if best_err == test_accuracy:
