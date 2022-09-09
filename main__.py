@@ -53,6 +53,7 @@ def main():
     # Data transforms (normalization & data augmentation)
     stats = ((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))
 
+    #이미지넷에서 코드 따옴
     jittering = util.ColorJitter(brightness=0.4, contrast=0.4,
                                   saturation=0.4)
     lighting = util.Lighting(alphastd=0.1,
@@ -61,9 +62,9 @@ def main():
                                       [-0.5808, -0.0045, -0.8140],
                                       [-0.5836, -0.6948, 0.4203]])
 
-    transf_train = tr.Compose([tr.ToTensor(), tr.RandomCrop(32, padding=4, padding_mode='reflect'),
+    transf_train = tr.Compose([tr.ToTensor(), tr.RandomCrop(32, padding=4, padding_mode='reflect'), #양 끝에 반사된 값 사용
                                tr.RandomHorizontalFlip(), jittering,
-                               lighting, tr.Normalize(*stats, inplace=True)])
+                               lighting, tr.Normalize(*stats, inplace=True)]) #inplace = 변경된 스탯으로 덮어씀
     transf_test = tr.Compose([tr.ToTensor(), tr.Normalize(*stats, inplace=True)])
 
     testset = CIFAR10(test_root, transform=transf_test)
@@ -74,8 +75,6 @@ def main():
 
     def show_batch(dl):
         for images, labels in dl:
-            # image = (image/np.amax(image) + 1)
-            # image = image/np.amax(image)
             fig, ax = plt.subplots(figsize=(12, 12))
             ax.set_xticks([]);
             ax.set_yticks([])
@@ -86,9 +85,10 @@ def main():
 
     #show_batch(trainloader)
 
-    criterion = nn.CrossEntropyLoss()
-    optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=0.9)
+    criterion = nn.CrossEntropyLoss() #crossentropy loss
+    optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=0.9) #loss 계산시 gradient descent 를 미니배치를 이용함
     scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=3, threshold=1e-3)
+    #loss 향상하지 않으면 lr 을 factor배로 감소(0.5), 3epoch동안, threhold란 중요변화에만 초점 맞추기 위한 임계값
 
     for epoch in range(args.epoch):
 
@@ -98,8 +98,9 @@ def main():
 
         print(f'Epoch:{epoch} Train loss:{train_loss} Train accuracy:{100*train_accuracy:.4f}% Test loss:{test_loss} Test accuracy:{100*test_accuracy:.4f}%')
 
-        best_err = test_accuracy <= best_err
-        best_err = min(test_accuracy, best_err)
+        if test_accuracy <= best_err:
+            best_err = test_accuracy #bool 값인지 확인
+            best_err = min(test_accuracy, best_err)
 
         # 현재까지 학습한 것 중 best_err인 경우
         if best_err == test_accuracy:
@@ -109,9 +110,7 @@ def main():
                 'epoch': epoch
             }, 'checkpoint.tar')
 
-
-
-    model.load_state_dict(torch.load('model_weights.pth'))
+    model.load_state_dict(torch.load('checkpoint.tar')) # 저장하는 가중치 이름 정리 필요
 
 
 if __name__ == "__main__":

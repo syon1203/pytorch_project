@@ -4,10 +4,11 @@ import torch.nn as nn
 import math
 
 
-def conv3x3(in_planes, out_planes, stride=1):
+#residual block
+def conv3x3(in_planes, out_planes, stride=1): #입출력 필터 개수,
     "3x3 convolution with padding"
     return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride,
-                     padding=1, bias=False)
+                     padding=1, bias=False) #스트라이드, 패딩 = 아웃풋 사이즈 보존 위해서
 
 
 class BasicBlock(nn.Module):
@@ -24,6 +25,7 @@ class BasicBlock(nn.Module):
         self.downsample = downsample
         self.stride = stride
 
+    #residual에 입력된 텐서 x 저장 후 신경망 거치고 뒤에서 out과 입력텐서 더한 다음 relu 거침
     def forward(self, x):
         residual = x
 
@@ -34,6 +36,9 @@ class BasicBlock(nn.Module):
         out = self.conv2(out)
         out = self.bn2(out)
 
+        #stride가 1이 아니라서 크기가 줄어들 경우 혹은 self.inplanes가 planes의 크기와 맞지 않을때 conv1x1에 1이 아닌 stride를 가진 레이어로 downsampling을 하게 됩니다.
+        #forward시 f(x)+x의 residual을 구현할 경우 f(x)와 x의 텐서사이즈가 다른 경우
+        #downsampling 필요할 시 downsample layer을 넣어줌
         if self.downsample is not None:
             residual = self.downsample(x)
 
@@ -87,7 +92,7 @@ class ResNet(nn.Module):
         super(ResNet, self).__init__()
         self.dataset = dataset
         if self.dataset.startswith('cifar'):
-            self.inplanes = 16
+            self.inplanes = 16 #inpot shape
             print(bottleneck)
             if bottleneck == True:
                 n = int((depth - 2) / 9)
@@ -99,10 +104,13 @@ class ResNet(nn.Module):
             self.conv1 = nn.Conv2d(3, self.inplanes, kernel_size=3, stride=1, padding=1, bias=False)
             self.bn1 = nn.BatchNorm2d(self.inplanes)
             self.relu = nn.ReLU(inplace=True)
+            #self._make_layer를 이용하여 residual block들을 쌓게 됩니다
+            #블록 거치며 필터 갯수 2배씩
             self.layer1 = self._make_layer(block, 16, n)
             self.layer2 = self._make_layer(block, 32, n, stride=2)
             self.layer3 = self._make_layer(block, 64, n, stride=2)
             self.avgpool = nn.AvgPool2d(8)
+            #ㅊfc 레이어 연결
             self.fc = nn.Linear(64 * block.expansion, num_classes)
 
         elif dataset == 'imagenet':
@@ -132,6 +140,7 @@ class ResNet(nn.Module):
                 m.bias.data.zero_()
 
     def _make_layer(self, block, planes, blocks, stride=1):
+        #stride가 1이 아니라서 크기가 줄어들 경우 혹은 self.inplanes가 planes의 크기와 맞지 않을때 conv1x1에 1이 아닌 stride를 가진 레이어로 downsampling을 하게 됩니다.
         downsample = None
         if stride != 1 or self.inplanes != planes * block.expansion:
             downsample = nn.Sequential(

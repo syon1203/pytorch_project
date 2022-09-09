@@ -6,8 +6,8 @@ device = torch.device('cuda' if use_cuda else 'cpu')
 
 def evaluation(model, dataloader, criterion):
     model.to(device)
-    model.eval()
-    with torch.no_grad():
+    model.eval() #eval 로 바꾸고
+    with torch.no_grad(): #메모리 사용량 줄이기 위해 gradient 계산 x , 연산속도 증가
         test_loss = 0.0
         test_accuracy = 0.0
         data_len = 0

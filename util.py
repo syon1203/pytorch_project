@@ -44,7 +44,7 @@ class Lighting(object):
         self.eigval = torch.Tensor(eigval)
         self.eigvec = torch.Tensor(eigvec)
 
-    def __call__(self, img):
+    def __call__(self, img): #0.1
         if self.alphastd == 0:
             return img
 
@@ -60,7 +60,7 @@ class Lighting(object):
 class Grayscale(object):
 
     def __call__(self, img):
-        gs = img.clone()
+        gs = img.clone() #이미지 복사본
         gs[0].mul_(0.299).add_(0.587, gs[1]).add_(0.114, gs[2])
         gs[1].copy_(gs[0])
         gs[2].copy_(gs[0])
@@ -74,7 +74,7 @@ class Saturation(object):
 
     def __call__(self, img):
         gs = Grayscale()(img)
-        alpha = random.uniform(-self.var, self.var)
+        alpha = random.uniform(-self.var, self.var) #최대 var 최소 var 사이 랜덤
         return img.lerp(gs, alpha)
 
 
